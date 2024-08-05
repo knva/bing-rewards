@@ -25,7 +25,7 @@ LOAD_DELAY = 1.5
 SEARCH_DELAY = 6
 
 # Bing Search base url, with new form= parameter (code differs per browser?)
-URL = 'https://www.bing.com/search?form=QBRE&q='
+URL = 'https://cn.bing.com/search?form=QBLH&q='
 
 # Edge Browser user agents
 # Makes Google Chrome look like MS Edge to Bing

@@ -29,6 +29,7 @@ from io import SEEK_END, SEEK_SET
 from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.parse import quote_plus
+import requests
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -63,6 +64,37 @@ def word_generator() -> Generator[str]:
             for line in fh:
                 # Use the built in file handler generator
                 yield line.strip()
+
+
+# 搜索词来源
+keywords_source = ['toutiaohot', 'baiduhot', 'zhihuhot', 'douyinhot']
+
+def fetch_keywords_from_source(source):
+    try:
+        response = requests.get(f"https://tenapi.cn/v2/{source}")
+        response.raise_for_status()  # 如果响应状态不是200，将引发HTTPError
+        data = response.json()
+
+        # 如果数据中存在有效项，提取每个元素的name属性值
+        if data.get('data'):
+            names = [item.get('name') for item in data['data'] if item]
+            return names
+    except requests.RequestException as e:
+        # 请求失败，记录错误
+        print(f'搜索词来源请求失败: {e}')
+
+    return []
+
+
+def douyinhot_dic() -> Generator[str]:
+    # 随机选择一个搜索词来源
+    random_keywords_source = random.choice(keywords_source)
+    names = fetch_keywords_from_source(random_keywords_source)
+    if names:
+        for name in names:
+            yield name
+    else:
+        return word_generator()
 
 
 def browser_cmd(exe: Path, agent: str, profile: str = '') -> list[str]:
@@ -191,7 +223,7 @@ def main():
     """
     options = app_options.get_options()
 
-    words_gen = word_generator()
+    words_gen = douyinhot_dic()
 
     def desktop():
         # Complete search with desktop settings
